@@ -109,7 +109,8 @@
     .panelBody{padding:16px}
     .txt{
       width:100%;min-height:220px;background:#0f1218;color:#eff3fb;border:1px solid #263042;
-      border-radius:12px;padding:12px;font-size:15px;line-height:1.45;resize:vertical;margin-top:10px
+      border-radius:12px;padding:12px;font-size:15px;line-height:1.45;resize:vertical;margin-top:10px;
+      display:none !important; /* hide editor in read-only */
     }
 
     /* Markdown preview styling */
@@ -120,7 +121,7 @@
     .md ul{margin:.35rem 0 .35rem 1.1rem}
     .md li{margin:.2rem 0;color:#e8edf8}
     .md em{font-style:italic} .md strong{font-weight:800;color:#fff}
-    .hint{color:#9fb0c9;font-size:12px;margin-top:6px}
+    .hint{display:none} /* hide hint in read-only */
     .footer{opacity:.8;font-size:12px;margin-top:14px}
 
     /* -------- Mobile tweaks (keep your layout; shorter header; fixed areas) -------- */
@@ -179,12 +180,12 @@
       <div class="panelHead">
         <div class="panelTitle" id="modalTitle">Title</div>
        <div class="btns" id="editButtons">
-  <button id="closeBtn" class="btn gold">Close</button>
-</div>
+          <button id="closeBtn" class="btn gold">Close</button>
+       </div>
       </div>
 
       <div class="panelBody">
-        <div id="mdPreview" class="md" style="display:none"></div>
+        <div id="mdPreview" class="md"></div>
         <textarea id="modalTxt" class="txt" placeholder="Use markdown:
 ## Heading
 - Bullet
@@ -197,10 +198,14 @@
 <script>
 (() => {
   const SOURCES = { primary:"data/primary.json", terrain:"data/terrain.json", secondary:"data/secondary.json" };
-const READ_ONLY = true; // make this version view-only
+  const READ_ONLY = true; // make this version view-only
+  // New: published share files (from your editor's Export)
+  const SHARES  = { primary:"shares/primary-text.json", terrain:"shares/terrain-text.json", secondary:"shares/secondary-text.json" };
 
   let currentTab = "secondary";
   let items = [];
+  let sharedText = {}; // title -> text (from shares/*-text.json)
+
   const grid = document.getElementById('grid');
   const search = document.getElementById('search');
   const jump   = document.getElementById('jump');
@@ -208,10 +213,8 @@ const READ_ONLY = true; // make this version view-only
   const modalTitle = document.getElementById('modalTitle');
   const modalTxt   = document.getElementById('modalTxt');
   const mdPreview  = document.getElementById('mdPreview');
-  const previewBtn = document.getElementById('previewBtn');
 
-  const keyFor = (tab,title)=>`ca2025:text:${tab}:${title}`;
-
+  // Tabs
   document.querySelectorAll('.tab').forEach(btn=>{
     btn.addEventListener('click', async () => {
       document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
@@ -222,12 +225,30 @@ const READ_ONLY = true; // make this version view-only
     });
   });
 
+  async function fetchJson(url){
+    try{
+      const res = await fetch(url, {cache:"no-cache"});
+      if(!res.ok) throw new Error(res.status);
+      return await res.json();
+    }catch(e){ return null; }
+  }
+
   async function loadAndRender(){
     try{
-      const res = await fetch(SOURCES[currentTab], {cache:"no-cache"});
-      const data = await res.json();
-      const raw = Array.isArray(data) ? data : (data.items||[]);
+      const data = await fetchJson(SOURCES[currentTab]);
+      const raw = Array.isArray(data) ? data : (data && data.items) || [];
       items = raw.slice().sort((a,b)=>a.title.localeCompare(b.title));
+
+      // Load your published text (so friends see your wording)
+      sharedText = {};
+      const share = await fetchJson(SHARES[currentTab]);
+      if (share && share.entries){
+        sharedText = share.entries || {};
+      } else if (Array.isArray(share) || (share && share.items)){
+        const arr = Array.isArray(share) ? share : (share.items || []);
+        arr.forEach(it => { if(it && it.title && it.text) sharedText[it.title] = it.text; });
+      }
+
       buildJump(items);
       render(items);
     }catch(e){
@@ -239,21 +260,26 @@ const READ_ONLY = true; // make this version view-only
     const q = search.value.trim().toLowerCase();
     const filtered = q ? list.filter(x=>x.title.toLowerCase().includes(q)) : list;
     grid.innerHTML = filtered.map(x=>{
-      const saved = localStorage.getItem(keyFor(currentTab, x.title));
-      const firstLine = (saved||x.text||"").split(/\r?\n/)[0] || "Tap to paste wording";
+      // Prefer published text; then data file text; then empty
+      const text = (sharedText[x.title] || x.text || "").trim();
+      const firstLine = (text.split(/\r?\n/)[0] || "No text published").trim();
       return `
         <div class="card" data-title="${escapeHtml(x.title)}">
           <div class="cardHead">${escapeHtml(x.title)}</div>
           <div class="cardBody">${escapeHtml(firstLine)}</div>
-          ${saved ? `<div class="chipSaved">Saved</div>` : ""}
         </div>`;
     }).join('') || `<div style="opacity:.8">No results.</div>`;
 
     grid.querySelectorAll('.card').forEach(card=>{
-      card.addEventListener('click',()=>openEditor(card.dataset.title));
+      card.addEventListener('click',()=>{
+        const title = card.dataset.title;
+        const body  = sharedText[title] || (items.find(i=>i.title===title)?.text || "");
+        openPreview(title, body);
+      });
     });
   }
 
+  // A–Z jump
   function buildJump(list){
     const letters = [...new Set(list.map(x=>x.title[0].toUpperCase()))].sort();
     jump.innerHTML = `<option value="">A–Z jump</option>`+
@@ -267,41 +293,18 @@ const READ_ONLY = true; // make this version view-only
   });
   search.addEventListener('input', ()=>render(items));
 
-  function openEditor(title){
+  // -------- Read-only: open preview (no editor) --------
+  function openPreview(title, text){
     modalTitle.textContent = title;
-    const saved = localStorage.getItem(keyFor(currentTab,title));
-    modalTxt.value = saved || "";
-    mdPreview.style.display = "none";
-    mdPreview.innerHTML = "";
+    mdPreview.innerHTML = renderMarkdown(String(text||""));
     modal.classList.add('show');
-    modalTxt.focus();
   }
   document.getElementById('closeBtn').onclick = ()=> modal.classList.remove('show');
-  document.getElementById('deleteBtn').onclick = ()=>{
-    localStorage.removeItem(keyFor(currentTab, modalTitle.textContent));
-    modalTxt.value="";
-    mdPreview.style.display="none";
-    render(items);
-  };
-  document.getElementById('saveBtn').onclick = ()=>{
-    localStorage.setItem(keyFor(currentTab, modalTitle.textContent), modalTxt.value);
-    modal.classList.remove('show');
-    render(items);
-  };
 
-  previewBtn.addEventListener('click', ()=>{
-    if(mdPreview.style.display === "none"){
-      mdPreview.innerHTML = renderMarkdown(modalTxt.value);
-      mdPreview.style.display = "block";
-    }else{
-      mdPreview.style.display = "none";
-    }
-  });
-
+  // -------- Markdown (your gold logic with italics across line breaks) --------
   function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;","»":"&raquo;","<":"&lt;","\"":"&quot;","'":"&#39;"}[c])); }
   function normalize(s){ return String(s||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n"); }
 
-  // -------- Markdown: keep layout; fix italics across line breaks --------
   function renderMarkdown(src){
     const text = normalize(src);
     const lines = text.split("\n");
@@ -309,8 +312,6 @@ const READ_ONLY = true; // make this version view-only
 
     const flushPara = () => {
       if (para.length){
-        // Join whole paragraph so *italics* can span line breaks,
-        // then run inlineMarkdown once, then convert \n to <br>
         const joined = para.join("\n");
         const rendered = inlineMarkdown(joined).replace(/\n/g, "<br>");
         html.push(`<p>${rendered}</p>`);
@@ -352,15 +353,9 @@ const READ_ONLY = true; // make this version view-only
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
   }
-  // Hide editing controls if read-only mode
-if (typeof READ_ONLY !== "undefined" && READ_ONLY) {
-  document.querySelectorAll(".card").forEach(c => c.style.cursor = "default");
-  document.getElementById("editButtons").style.display = "none";
-  // Disable click opening
-  grid.querySelectorAll('.card').forEach(card => {
-    card.replaceWith(card.cloneNode(true));
-  });
-}
+
+  // Keep edit buttons area but show only Close (already the case in HTML).
+  // Do NOT disable card clicks; we want preview to open.
 
   loadAndRender();
 })();
