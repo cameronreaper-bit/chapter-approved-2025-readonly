@@ -1,0 +1,1 @@
+const CACHE_NAME='ca2025-cache-v1';

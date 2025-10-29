@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chapter Approved 2025</title>
+
+  <!-- PWA + iOS icon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-512.png">
+
+  <style>
+    :root{
+      --bg:#0e0f12; --panel:#12141a; --elev:#181b22;
+      --blue:#1e3a78; --blue-grad:#274690;
+      --gold:#d7c178; --text:#e9edf3; --muted:#9aa3b2;
+      --chip:#2a2f3a; --card:#141820; --radius:16px;
+      --shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;height:100%;
+      background:var(--bg);color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      overflow-x:clip;max-width:100vw;
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+
+    /* Header (blue) */
+    .hero{
+      background:linear-gradient(180deg,var(--blue),var(--blue-grad));
+      border-bottom:2px solid rgba(215,193,120,.35);
+      box-shadow:var(--shadow);
+      border-radius:0 0 var(--radius) var(--radius);
+      /* ↓  shorter than previous (was 18/20) */
+      padding:14px 16px 14px;
+      position:sticky; top:0; z-index:5;
+      overflow:hidden; max-width:100vw;
+    }
+    .title{
+      display:flex;align-items:center;gap:12px;
+      margin:0 0 8px 0; /* tighter */
+      font-weight:800;letter-spacing:.2px;font-size:22px;color:#fff
+    }
+    /* New, tidy 40K badge */
+    .logo40k{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:44px;height:28px;border-radius:10px;
+      background:linear-gradient(180deg,#1e3a78,#274690);
+      border:1px solid rgba(215,193,120,.55);
+      color:#fff;font-weight:900;font-size:14px;letter-spacing:.5px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+      flex:0 0 auto;
+    }
+    .badge{
+      background:rgba(215,193,120,.18);color:#fff;border:1px solid rgba(215,193,120,.5);
+      padding:4px 10px;border-radius:999px;font-size:12px
+    }
+    .bar{display:grid;grid-template-columns:1fr auto;gap:10px;max-width:100%}
+    .input,.select{background:#0f1218;border:1px solid #1f2531;border-radius:12px;
+      padding:12px 12px;font-size:15px;color:#fff;outline:none;min-width:0}
+    .tabs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .tab{background:var(--chip);color:#d9e2f1;border:1px solid #2f3746;cursor:pointer;
+      padding:8px 12px;border-radius:999px;font-weight:600;font-size:13px}
+    .tab.active{background:var(--gold);color:#101217;border-color:transparent}
+
+    /* Cards */
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+    @media(min-width:680px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:linear-gradient(180deg,#191e28,#12161e);border:1px solid #242a37;
+      border-radius:18px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;position:relative}
+    .cardHead{
+      background:linear-gradient(180deg,#1e3a78,#274690);
+      color:#fff;padding:12px 14px;border-bottom:1px dashed rgba(255,255,255,.25);
+      font-weight:800;letter-spacing:.3px;border-top:1px solid rgba(215,193,120,.45)
+    }
+    .cardBody{padding:12px 14px;color:var(--muted);font-size:14px;min-height:56px}
+    .chipSaved{position:absolute;right:10px;top:10px;background:rgba(61,141,93,.18);
+      border:1px solid rgba(61,141,93,.55);color:#bdf4cf;font-size:11px;padding:4px 8px;border-radius:999px}
+
+    /* Modal */
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      display:none;align-items:center;justify-content:center;
+      padding:clamp(8px,2vh,16px);z-index:20;
+      max-width:100vw;overflow-x:clip;
+    }
+    .modal.show{display:flex}
+    .panel{
+      width:min(820px,96vw);max-height:92vh;overflow:auto;
+      background:linear-gradient(180deg,var(--panel),var(--elev));
+      border:1px solid #2a3242;border-radius:18px;box-shadow:var(--shadow);
+      padding:0; display:block;
+    }
+    .panelHead{
+      position:sticky; top:0; z-index:1;
+      background:linear-gradient(180deg,var(--panel),#151922);
+      border-bottom:1px solid #2a3242;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      padding:14px 16px;
+    }
+    .panelTitle{font-weight:900;font-size:18px;color:#fff}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border-radius:12px;border:1px solid #2b3241;background:#12161e;color:#dde4f1;
+      padding:10px 12px;font-weight:700;font-size:14px;cursor:pointer}
+    .btn.gold{background:var(--gold);color:#141616;border:0}
+    .btn.danger{border-color:#4a2626;background:#1a0f10;color:#f3c9c9}
+    .panelBody{padding:16px}
+    .txt{
+      width:100%;min-height:220px;background:#0f1218;color:#eff3fb;border:1px solid #263042;
+      border-radius:12px;padding:12px;font-size:15px;line-height:1.45;resize:vertical;margin-top:10px
+    }
+
+    /* Markdown preview styling */
+    .md{background:#0c1017;border:1px solid #263042;border-radius:12px;padding:12px;margin-top:8px}
+    .md h1,.md h2{margin:.2rem 0 .5rem 0; color:var(--gold)}
+    .md h1{font-size:1.2rem} .md h2{font-size:1.05rem}
+    .md p{margin:0.9rem 0;color:#fff;white-space:pre-wrap}
+    .md ul{margin:.35rem 0 .35rem 1.1rem}
+    .md li{margin:.2rem 0;color:#e8edf8}
+    .md em{font-style:italic} .md strong{font-weight:800;color:#fff}
+    .hint{color:#9fb0c9;font-size:12px;margin-top:6px}
+    .footer{opacity:.8;font-size:12px;margin-top:14px}
+
+    /* -------- Mobile tweaks (keep your layout; shorter header; fixed areas) -------- */
+    @media (max-width:600px){
+      .hero{padding:10px 12px 10px;}                 /* shorter than before */
+      .title{font-size:20px;margin:0 0 6px;gap:10px}
+      .badge{font-size:11px;padding:3px 8px}
+      .logo40k{width:40px;height:26px;font-size:13px;border-radius:9px}
+
+      .bar{
+        display:grid;
+        grid-template-columns:1fr auto;
+        grid-template-areas:
+          "search jump"
+          "tabs   tabs";
+        gap:8px; align-items:center;
+      }
+      #search.input{grid-area:search}
+      #jump.select{grid-area:jump}
+      .tabs{grid-area:tabs;margin-top:4px;gap:7px}
+
+      .input,.select{padding:10px 12px;font-size:16px}
+      .tab{padding:7px 10px;font-size:13px}
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="wrap">
+      <div class="title">
+        <span class="logo40k">40K</span>
+        Chapter Approved 2025
+        <span class="badge">Offline-capable</span>
+      </div>
+
+      <div class="bar">
+        <input id="search" class="input" placeholder="Search titles…" />
+        <select id="jump" class="select"></select>
+        <div class="tabs">
+          <button class="tab active" data-tab="secondary">Secondary Missions</button>
+          <button class="tab" data-tab="primary">Primary Missions</button>
+          <button class="tab" data-tab="terrain">Terrain Layouts</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="grid" class="grid"></div>
+    <div class="footer">Private table reference. Text & imagery © Games Workshop. No affiliation.</div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="panel">
+      <div class="panelHead">
+        <div class="panelTitle" id="modalTitle">Title</div>
+        <div class="btns">
+          <button id="previewBtn" class="btn">Preview</button>
+          <button id="exportBtn" class="btn">Export text</button>
+          <label class="btn">
+            Import text<input type="file" id="importFile" accept="application/json" style="display:none">
+          </label>
+          <button id="deleteBtn" class="btn danger">Clear text</button>
+          <button id="saveBtn" class="btn gold">Save</button>
+          <button id="closeBtn" class="btn">Close</button>
+        </div>
+      </div>
+
+      <div class="panelBody">
+        <div id="mdPreview" class="md" style="display:none"></div>
+        <textarea id="modalTxt" class="txt" placeholder="Use markdown:
+## Heading
+- Bullet
+**Bold** and *italics*"></textarea>
+        <div class="hint">Single Enter = line break · Blank line = new paragraph · <code>##</code> heading is gold · <code>- </code> bullets · <code>**bold**</code>, <code>*italics*</code>.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const SOURCES = { primary:"data/primary.json", terrain:"data/terrain.json", secondary:"data/secondary.json" };
+
+  let currentTab = "secondary";
+  let items = [];
+  const grid = document.getElementById('grid');
+  const search = document.getElementById('search');
+  const jump   = document.getElementById('jump');
+  const modal  = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalTxt   = document.getElementById('modalTxt');
+  const mdPreview  = document.getElementById('mdPreview');
+  const previewBtn = document.getElementById('previewBtn');
+
+  const keyFor = (tab,title)=>`ca2025:text:${tab}:${title}`;
+
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', async () => {
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      search.value = "";
+      await loadAndRender();
+    });
+  });
+
+  async function loadAndRender(){
+    try{
+      const res = await fetch(SOURCES[currentTab], {cache:"no-cache"});
+      const data = await res.json();
+      const raw = Array.isArray(data) ? data : (data.items||[]);
+      items = raw.slice().sort((a,b)=>a.title.localeCompare(b.title));
+      buildJump(items);
+      render(items);
+    }catch(e){
+      grid.innerHTML = `<div style="opacity:.8">Failed to load ${currentTab}.json</div>`;
+    }
+  }
+
+  function render(list){
+    const q = search.value.trim().toLowerCase();
+    const filtered = q ? list.filter(x=>x.title.toLowerCase().includes(q)) : list;
+    grid.innerHTML = filtered.map(x=>{
+      const saved = localStorage.getItem(keyFor(currentTab, x.title));
+      const firstLine = (saved||x.text||"").split(/\r?\n/)[0] || "Tap to paste wording";
+      return `
+        <div class="card" data-title="${escapeHtml(x.title)}">
+          <div class="cardHead">${escapeHtml(x.title)}</div>
+          <div class="cardBody">${escapeHtml(firstLine)}</div>
+          ${saved ? `<div class="chipSaved">Saved</div>` : ""}
+        </div>`;
+    }).join('') || `<div style="opacity:.8">No results.</div>`;
+
+    grid.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('click',()=>openEditor(card.dataset.title));
+    });
+  }
+
+  function buildJump(list){
+    const letters = [...new Set(list.map(x=>x.title[0].toUpperCase()))].sort();
+    jump.innerHTML = `<option value="">A–Z jump</option>`+
+      letters.map(l=>`<option value="${l}">${l}</option>`).join('');
+  }
+  jump.addEventListener('change', ()=>{
+    const letter = jump.value;
+    if(!letter) return;
+    const el = [...grid.querySelectorAll('.card')].find(c=>c.dataset.title.startsWith(letter));
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  search.addEventListener('input', ()=>render(items));
+
+  function openEditor(title){
+    modalTitle.textContent = title;
+    const saved = localStorage.getItem(keyFor(currentTab,title));
+    modalTxt.value = saved || "";
+    mdPreview.style.display = "none";
+    mdPreview.innerHTML = "";
+    modal.classList.add('show');
+    modalTxt.focus();
+  }
+  document.getElementById('closeBtn').onclick = ()=> modal.classList.remove('show');
+  document.getElementById('deleteBtn').onclick = ()=>{
+    localStorage.removeItem(keyFor(currentTab, modalTitle.textContent));
+    modalTxt.value="";
+    mdPreview.style.display="none";
+    render(items);
+  };
+  document.getElementById('saveBtn').onclick = ()=>{
+    localStorage.setItem(keyFor(currentTab, modalTitle.textContent), modalTxt.value);
+    modal.classList.remove('show');
+    render(items);
+  };
+
+  previewBtn.addEventListener('click', ()=>{
+    if(mdPreview.style.display === "none"){
+      mdPreview.innerHTML = renderMarkdown(modalTxt.value);
+      mdPreview.style.display = "block";
+    }else{
+      mdPreview.style.display = "none";
+    }
+  });
+
+  function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;","»":"&raquo;","<":"&lt;","\"":"&quot;","'":"&#39;"}[c])); }
+  function normalize(s){ return String(s||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n"); }
+
+  // -------- Markdown: keep layout; fix italics across line breaks --------
+  function renderMarkdown(src){
+    const text = normalize(src);
+    const lines = text.split("\n");
+    let html = [], inList = false, para = [];
+
+    const flushPara = () => {
+      if (para.length){
+        // Join whole paragraph so *italics* can span line breaks,
+        // then run inlineMarkdown once, then convert \n to <br>
+        const joined = para.join("\n");
+        const rendered = inlineMarkdown(joined).replace(/\n/g, "<br>");
+        html.push(`<p>${rendered}</p>`);
+        para = [];
+      }
+    };
+    const flushList = () => { if (inList){ html.push('</ul>'); inList = false; } };
+
+    for (let i = 0; i < lines.length; i++){
+      const line = lines[i];
+      if (/^\s*$/.test(line)){ flushList(); flushPara(); continue; }
+      if (/^#{1,2}\s+/.test(line)){
+        flushList(); flushPara();
+        const lvl = line.startsWith('##') ? 'h2' : 'h1';
+        html.push(`<${lvl}>${inlineMarkdown(line.replace(/^#{1,2}\s+/, ''))}</${lvl}>`);
+        continue;
+      }
+      if (/^\s*[-*]\s+/.test(line)){
+        flushPara();
+        if (!inList){ html.push('<ul>'); inList = true; }
+        html.push(`<li>${inlineMarkdown(line.replace(/^\s*[-*]\s+/, ''))}</li>`);
+        continue;
+      }
+      para.push(line);
+    }
+    flushList(); flushPara();
+    return html.join('\n');
+  }
+
+  function inlineMarkdown(s){
+    s = String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    // Bold across newlines
+    s = s.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+    // Italics across newlines; avoid matching ** pairs
+    s = s.replace(/(^|[^*])\*(?!\*)([\s\S]+?)\*(?!\*)/g, "$1<em>$2</em>");
+    return s;
+  }
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  }
+  loadAndRender();
+})();
+</script>
+</body>
+</html>
