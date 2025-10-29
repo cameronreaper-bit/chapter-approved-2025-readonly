@@ -178,16 +178,9 @@
     <div class="panel">
       <div class="panelHead">
         <div class="panelTitle" id="modalTitle">Title</div>
-        <div class="btns">
-          <button id="previewBtn" class="btn">Preview</button>
-          <button id="exportBtn" class="btn">Export text</button>
-          <label class="btn">
-            Import text<input type="file" id="importFile" accept="application/json" style="display:none">
-          </label>
-          <button id="deleteBtn" class="btn danger">Clear text</button>
-          <button id="saveBtn" class="btn gold">Save</button>
-          <button id="closeBtn" class="btn">Close</button>
-        </div>
+       <div class="btns" id="editButtons">
+  <button id="closeBtn" class="btn gold">Close</button>
+</div>
       </div>
 
       <div class="panelBody">
@@ -204,6 +197,7 @@
 <script>
 (() => {
   const SOURCES = { primary:"data/primary.json", terrain:"data/terrain.json", secondary:"data/secondary.json" };
+const READ_ONLY = true; // make this version view-only
 
   let currentTab = "secondary";
   let items = [];
@@ -358,6 +352,16 @@
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
   }
+  // Hide editing controls if read-only mode
+if (typeof READ_ONLY !== "undefined" && READ_ONLY) {
+  document.querySelectorAll(".card").forEach(c => c.style.cursor = "default");
+  document.getElementById("editButtons").style.display = "none";
+  // Disable click opening
+  grid.querySelectorAll('.card').forEach(card => {
+    card.replaceWith(card.cloneNode(true));
+  });
+}
+
   loadAndRender();
 })();
 </script>
