@@ -1,1 +1,12 @@
-{"category": "Primary Missions", "items": []}
+[
+  { "title": "Linchpin", "text": "" },
+  { "title": "Burden of Trust", "text": "" },
+  { "title": "Take and Hold", "text": "" },
+  { "title": "Terraform", "text": "" },
+  { "title": "Purge the Foe", "text": "" },
+  { "title": "Scorched Earth", "text": "" },
+  { "title": "Unexploded Ordnance", "text": "" },
+  { "title": "Hidden Supplies", "text": "" },
+  { "title": "The Ritual", "text": "" },
+  { "title": "Supply Drop", "text": "" }
+]
