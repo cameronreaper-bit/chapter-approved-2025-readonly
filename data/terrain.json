@@ -1,1 +1,27 @@
-{"category": "Terrain Layouts", "items": []}
+{
+  "category": "Terrain Layouts",
+  "groups": [
+    {
+      "name": "Strike Force",
+      "items": [
+        { "title": "Tipping Point", "src": "terrain/strike/tipping_point.webp" },
+        { "title": "Hammer and Anvil", "src": "terrain/strike/hammer_and_anvil.webp" },
+        { "title": "Sweeping Engagement", "src": "terrain/strike/sweeping_engagement.webp" },
+        { "title": "Dawn of War", "src": "terrain/strike/dawn_of_war.webp" },
+        { "title": "Search and Destroy", "src": "terrain/strike/search_and_destroy.webp" },
+        { "title": "Crucible of Battle", "src": "terrain/strike/crucible_of_battle.webp" }
+      ]
+    },
+    {
+      "name": "Incursion",
+      "items": [
+        { "title": "Tipping Point", "src": "terrain/incursion/tipping_point.webp" },
+        { "title": "Hammer and Anvil", "src": "terrain/incursion/hammer_and_anvil.webp" },
+        { "title": "Sweeping Engagement", "src": "terrain/incursion/sweeping_engagement.webp" },
+        { "title": "Dawn of War", "src": "terrain/incursion/dawn_of_war.webp" },
+        { "title": "Search and Destroy", "src": "terrain/incursion/search_and_destroy.webp" },
+        { "title": "Crucible of Battle", "src": "terrain/incursion/crucible_of_battle.webp" }
+      ]
+    }
+  ]
+}
